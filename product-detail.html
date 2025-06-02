@@ -272,9 +272,9 @@
 
                 // Add to Cart Button Logic
                 const addToCartButton = document.getElementById('add-to-cart-product-page');
-                const quantityInput = document.getElementById('quantity-input-product-page');
+                // const quantityInput = document.getElementById('quantity-input-product-page'); // Removed redeclaration
 
-                if (addToCartButton && quantityInput && product.stock > 0) {
+                if (addToCartButton && quantityInput && product.stock > 0) { // quantityInput is defined above
                     addToCartButton.addEventListener('click', () => {
                         const quantity = parseInt(quantityInput.value);
                         // Note: product.id is available from the outer scope where 'product' is defined
