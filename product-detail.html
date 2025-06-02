@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Detail | ELEVATE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Montserrat', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .nav-link::after {
+            content: '';
+            display: block;
+            width: 0;
+            height: 2px;
+            background: #000;
+            transition: width 0.3s;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        /* Basic styling for size/color buttons */
+        .size-option, .color-option {
+            transition: all 0.2s ease;
+        }
+        .size-option.selected, .color-option.selected {
+            border-color: #000;
+            background-color: #f0f0f0;
+        }
+        .color-swatch {
+            width: 2rem; /* w-8 */
+            height: 2rem; /* h-8 */
+            border-radius: 9999px; /* rounded-full */
+            border-width: 2px;
+            border-color: transparent;
+        }
+        .color-swatch.selected {
+            --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+            --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+            box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+            --tw-ring-color: rgba(59, 130, 246, 0.5); /* Example blue */
+            --tw-ring-offset-width: 2px;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; transform: translateY(20px); }
+            10%, 90% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeInOut {
+            animation: fadeInOut 3s ease-in-out forwards;
+            z-index: 100; /* Ensure it's above other elements */
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Simplified Navigation -->
+    <nav class="bg-white shadow-sm fixed w-full z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-xl font-bold text-gray-900">ELEVATE</a>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html#home" class="nav-link text-gray-700 hover:text-gray-900 px-1">Home</a>
+                    <a href="index.html#shop" class="nav-link text-gray-700 hover:text-gray-900 px-1">Shop</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="index.html#cart-sidebar" class="text-gray-700 hover:text-gray-900 relative">
+                        <i class="fas fa-shopping-bag"></i>
+                        <!-- Cart count can be dynamic if this page shares cart logic later -->
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Product Detail Section -->
+    <main class="pt-20 pb-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div id="product-detail-container" class="mt-10">
+            <!-- Product content will be loaded here by JS -->
+        </div>
+    </main>
+
+    <!-- Simplified Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <p class="text-gray-500 text-sm">&copy; 2023 ELEVATE. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Cart state
+        let cart;
+        try {
+            const storedCart = localStorage.getItem('cart');
+            cart = storedCart ? JSON.parse(storedCart) : [];
+            if (!Array.isArray(cart)) { // Ensure it's an array
+                 cart = [];
+            }
+        } catch (e) {
+            console.error("Error parsing cart from localStorage", e);
+            cart = [];
+        }
+
+        // Sample product data (eventually this would come from a shared source or API)
+        const products = [
+            {
+                id: 1,
+                title: "Classic White Tee",
+                price: 39.99,
+                image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=880&q=80",
+                description: "Premium quality cotton t-shirt with a relaxed fit. Perfect for everyday wear. Made from 100% organic cotton, this tee offers both comfort and style. Available in various sizes and colors.",
+                category: "men",
+                stock: 20,
+                availableSizes: ["S", "M", "L", "XL"],
+                availableColors: [
+                    { name: "White", class: "bg-white" },
+                    { name: "Black", class: "bg-black" },
+                    { name: "Gray", class: "bg-gray-400" }
+                ]
+            },
+            {
+                id: 2,
+                title: "Black Denim Jacket",
+                price: 89.99,
+                image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=736&q=80",
+                description: "Stylish black denim jacket with a classic fit. Features multiple pockets and premium hardware. A versatile piece that can be dressed up or down.",
+                category: "men",
+                stock: 15,
+                availableSizes: ["M", "L", "XL"],
+                availableColors: [{ name: "Black", class: "bg-black" }]
+            },
+            {
+                id: 3,
+                title: "Floral Summer Dress",
+                price: 59.99,
+                image: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
+                description: "Lightweight floral dress perfect for summer days. Made from breathable fabric, this dress features a vibrant floral pattern and a comfortable fit.",
+                category: "women",
+                stock: 0, // Example of out of stock
+                availableSizes: ["S", "M", "L"],
+                availableColors: [{ name: "Floral", class: "bg-pink-300" }] // Placeholder color
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const productDetailContainer = document.getElementById('product-detail-container');
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = parseInt(urlParams.get('id'));
+
+            if (!productId) {
+                productDetailContainer.innerHTML = '<p class="text-center text-red-500">Product ID not provided in URL.</p>';
+                return;
+            }
+
+            const product = products.find(p => p.id === productId);
+
+            if (product) {
+                productDetailContainer.innerHTML = `
+                    <div class="md:flex md:space-x-8">
+                        <!-- Left Column: Image Gallery -->
+                        <div class="md:w-1/2 mb-8 md:mb-0">
+                            <img id="product-image" src="${product.image}" alt="${product.title}" class="w-full rounded-lg shadow-lg object-cover h-auto md:max-h-[500px]">
+                            <div class="mt-4 grid grid-cols-5 gap-2" id="thumbnail-gallery">
+                                <!-- Thumbnails would go here -->
+                                <img src="${product.image}" alt="Thumbnail 1" class="w-full h-20 object-cover rounded-md border-2 border-black cursor-pointer">
+                                <!-- Add more placeholder thumbnails if needed -->
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Product Info -->
+                        <div class="md:w-1/2">
+                            <h1 id="product-title" class="text-3xl font-bold text-gray-900 mb-2">${product.title}</h1>
+                            <p id="product-price" class="text-2xl text-gray-700 font-semibold mb-4">$${product.price.toFixed(2)}</p>
+
+                            <div class="mb-4">
+                                <p id="product-stock" class="text-sm font-medium ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}">
+                                    ${product.stock > 0 ? `${product.stock} in stock` : 'Out of Stock'}
+                                </p>
+                            </div>
+
+                            <p id="product-description" class="text-gray-600 mb-6 leading-relaxed">${product.description}</p>
+
+                            <!-- Size Options -->
+                            <div class="mb-6">
+                                <h3 class="text-sm font-medium text-gray-900 mb-2">Size</h3>
+                                <div id="size-options" class="flex space-x-2">
+                                    ${product.availableSizes ? product.availableSizes.map((size, index) => `
+                                        <button class="size-option border border-gray-300 py-2 px-4 text-sm rounded hover:border-black ${index === 0 ? 'selected' : ''}" data-size="${size}">
+                                            ${size}
+                                        </button>
+                                    `).join('') : '<p class="text-sm text-gray-500">N/A</p>'}
+                                </div>
+                            </div>
+
+                            <!-- Color Options -->
+                            <div class="mb-6">
+                                <h3 class="text-sm font-medium text-gray-900 mb-2">Color</h3>
+                                <div id="color-options" class="flex space-x-2">
+                                    ${product.availableColors ? product.availableColors.map((color, index) => `
+                                        <button class="color-option group" data-color-name="${color.name}" title="${color.name}">
+                                            <span class="color-swatch ${color.class} ${index === 0 ? 'selected' : ''} group-hover:ring-2 group-hover:ring-gray-400"></span>
+                                        </button>
+                                    `).join('') : '<p class="text-sm text-gray-500">N/A</p>'}
+                                </div>
+                            </div>
+
+                            <!-- Quantity Selector -->
+                            <div class="mb-6">
+                                <label for="quantity-product-page" class="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
+                                <div class="flex items-center">
+                                    <button class="border border-gray-300 px-3 py-1.5 rounded-l hover:bg-gray-100" id="decrease-quantity-product-page">-</button>
+                                    <input type="text" value="1" class="w-12 text-center border-t border-b border-gray-300 py-1.5" id="quantity-input-product-page" readonly>
+                                    <button class="border border-gray-300 px-3 py-1.5 rounded-r hover:bg-gray-100" id="increase-quantity-product-page">+</button>
+                                </div>
+                            </div>
+
+                            <!-- Add to Cart Button -->
+                            <button id="add-to-cart-product-page"
+                                    class="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800 transition duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black
+                                           ${product.stock === 0 ? 'opacity-50 cursor-not-allowed' : ''}"
+                                    ${product.stock === 0 ? 'disabled' : ''}>
+                                ${product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                // Basic Quantity Toggle Logic (similar to quick view)
+                const quantityInput = document.getElementById('quantity-input-product-page');
+                const decreaseBtn = document.getElementById('decrease-quantity-product-page');
+                const increaseBtn = document.getElementById('increase-quantity-product-page');
+
+                if (quantityInput && decreaseBtn && increaseBtn) {
+                    decreaseBtn.addEventListener('click', () => {
+                        let currentValue = parseInt(quantityInput.value);
+                        if (currentValue > 1) {
+                            quantityInput.value = currentValue - 1;
+                        }
+                    });
+                    increaseBtn.addEventListener('click', () => {
+                        let currentValue = parseInt(quantityInput.value);
+                        // Potentially check against product.stock here if desired
+                        quantityInput.value = currentValue + 1;
+                    });
+                }
+
+                // Size selection logic
+                document.querySelectorAll('.size-option').forEach(button => {
+                    button.addEventListener('click', () => {
+                        document.querySelectorAll('.size-option').forEach(btn => btn.classList.remove('selected'));
+                        button.classList.add('selected');
+                        // console.log('Selected size:', button.dataset.size);
+                    });
+                });
+
+                // Color selection logic
+                document.querySelectorAll('.color-option').forEach(button => {
+                    button.addEventListener('click', () => {
+                        document.querySelectorAll('.color-option .color-swatch').forEach(sw => sw.classList.remove('selected'));
+                        button.querySelector('.color-swatch').classList.add('selected');
+                        // console.log('Selected color:', button.dataset.colorName);
+                    });
+                });
+
+                // Add to Cart Button Logic
+                const addToCartButton = document.getElementById('add-to-cart-product-page');
+                const quantityInput = document.getElementById('quantity-input-product-page');
+
+                if (addToCartButton && quantityInput && product.stock > 0) {
+                    addToCartButton.addEventListener('click', () => {
+                        const quantity = parseInt(quantityInput.value);
+                        // Note: product.id is available from the outer scope where 'product' is defined
+                        addProductToCart(product.id, quantity);
+
+                        const originalText = addToCartButton.textContent;
+                        addToCartButton.textContent = 'Added!';
+                        addToCartButton.disabled = true; // Briefly disable
+                        setTimeout(() => {
+                            addToCartButton.textContent = originalText;
+                            addToCartButton.disabled = false; // Re-enable
+                        }, 2000);
+                    });
+                }
+
+            } else {
+                productDetailContainer.innerHTML = '<p class="text-center text-xl text-gray-700">Product not found.</p>';
+            }
+        });
+
+        // Cart Functions (adapted from index.html)
+        // Renamed to addProductToCart to avoid conflict if this script were ever merged differently
+        function addProductToCart(productId, quantity = 1) {
+            const product = products.find(p => p.id === productId); // Ensure 'products' array is accessible
+            if (product) {
+                const existingItem = cart.find(item => item.id === productId);
+                if (existingItem) {
+                    existingItem.quantity += quantity;
+                } else {
+                    cart.push({ ...product, quantity: quantity });
+                }
+                updateProductCart(); // Renamed updateCart
+
+                // Show a quick notification
+                const notification = document.createElement('div');
+                notification.className = 'fixed bottom-4 right-4 bg-black text-white px-4 py-3 rounded-md shadow-lg animate-fadeInOut text-sm';
+                notification.textContent = `${product.title} added to cart!`;
+                document.body.appendChild(notification);
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+        }
+
+        function updateProductCart() { // Renamed updateCart
+            localStorage.setItem('cart', JSON.stringify(cart));
+            // No dynamic cart display (like sidebar or full cart count update) on this page for now.
+            // If a simple cart count were in the header, it could be updated here.
+            // For example, if a <span id="cart-count-detail"> existed:
+            // const cartCountDetailEl = document.getElementById('cart-count-detail');
+            // if (cartCountDetailEl) {
+            //    const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+            //    cartCountDetailEl.textContent = totalItems;
+            // }
+        }
+    </script>
+
+</body>
+</html>

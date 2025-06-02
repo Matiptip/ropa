@@ -63,6 +63,56 @@
         .nav-link:hover::after {
             width: 100%;
         }
+
+        /* Cart Sidebar Transitions */
+        #cart-panel { /* Applied to the div.w-screen.max-w-md */
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        #cart-sidebar.cart-sidebar-open #cart-panel {
+            transform: translateX(0);
+        }
+
+        #cart-overlay {
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        #cart-sidebar.cart-sidebar-open #cart-overlay {
+            opacity: 1; /* Tailwind bg-opacity-75 will make it appear as 0.75 */
+        }
+
+        /* Hero Section Animation */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeInUp { animation: fadeInUp 0.8s ease-out forwards; }
+        .hero-text-h1, .hero-text-p, .hero-button-shop { opacity: 0; /* Initially hidden for animation */ }
+        .hero-text-h1 { animation-delay: 0.2s; }
+        .hero-text-p { animation-delay: 0.4s; }
+        .hero-button-shop { animation-delay: 0.6s; }
+
+        /* Scroll-based Fade-in Animations */
+        .fade-in-on-scroll {
+            opacity: 0;
+            transition: opacity 0.8s ease-out;
+        }
+        .fade-in-on-scroll.is-visible {
+            opacity: 1;
+        }
+
+        /* Mobile Menu & Search Bar Transitions */
+        #mobile-menu, #search-bar {
+            transform: translateY(-20px); /* Start slightly above or use -100% for full slide */
+            opacity: 0;
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+            pointer-events: none; /* Prevent interaction when hidden */
+        }
+        #mobile-menu.is-open, #search-bar.is-open {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -95,19 +145,19 @@
         </div>
         
         <!-- Mobile Menu -->
-        <div class="md:hidden hidden bg-white" id="mobile-menu">
+        <div class="md:hidden bg-white shadow-lg" id="mobile-menu"> <!-- Removed hidden, will be controlled by JS -->
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="#home" class="block px-3 py-2 text-gray-700 hover:text-gray-900">Home</a>
-                <a href="#shop" class="block px-3 py-2 text-gray-700 hover:text-gray-900">Shop</a>
-                <a href="#collections" class="block px-3 py-2 text-gray-700 hover:text-gray-900">Collections</a>
-                <a href="#about" class="block px-3 py-2 text-gray-700 hover:text-gray-900">About</a>
+                <a href="#home" class="block px-3 py-2 text-gray-700 hover:text-gray-900 rounded-md">Home</a>
+                <a href="#shop" class="block px-3 py-2 text-gray-700 hover:text-gray-900 rounded-md">Shop</a>
+                <a href="#collections" class="block px-3 py-2 text-gray-700 hover:text-gray-900 rounded-md">Collections</a>
+                <a href="#about" class="block px-3 py-2 text-gray-700 hover:text-gray-900 rounded-md">About</a>
             </div>
         </div>
         
         <!-- Search Bar -->
-        <div class="hidden bg-white py-2 px-4" id="search-bar">
+        <div class="bg-white py-2 px-4 shadow-md" id="search-bar"> <!-- Removed hidden, will be controlled by JS -->
             <div class="max-w-7xl mx-auto flex">
-                <input type="text" placeholder="Search for products..." class="flex-1 border-b border-gray-300 focus:border-black focus:outline-none py-2 px-2">
+                <input type="text" placeholder="Search for products..." class="flex-1 border-b border-gray-300 focus:border-black focus:outline-none py-2 px-2 text-sm">
                 <button class="ml-2 text-gray-700 hover:text-gray-900">
                     <i class="fas fa-search"></i>
                 </button>
@@ -116,15 +166,15 @@
     </nav>
 
     <!-- Hero Section -->
-    <section id="home" class="hero-gradient pt-24 pb-16 md:pt-32 md:pb-24">
+    <section id="home" class="hero-gradient pt-24 pb-16 md:pt-32 md:pb-24 overflow-hidden"> <!-- Added overflow-hidden for safety with animations -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="md:flex items-center">
                 <div class="md:w-1/2 mb-10 md:mb-0">
-                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">Elevate Your Style</h1>
-                    <p class="text-lg text-gray-700 mb-8">Discover our premium collection of clothing designed for the modern individual who values quality and sophistication.</p>
-                    <a href="#shop" class="bg-black text-white px-8 py-3 rounded-md hover:bg-gray-800 transition duration-300 inline-block">Shop Now</a>
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 animate-fadeInUp hero-text-h1">Elevate Your Style</h1>
+                    <p class="text-lg text-gray-700 mb-8 animate-fadeInUp hero-text-p">Discover our premium collection of clothing designed for the modern individual who values quality and sophistication.</p>
+                    <a href="#shop" class="bg-black text-white px-8 py-3 rounded-md hover:bg-gray-800 transition duration-300 inline-block animate-fadeInUp hero-button-shop">Shop Now</a>
                 </div>
-                <div class="md:w-1/2 flex justify-center">
+                <div class="md:w-1/2 flex justify-center animate-fadeInUp" style="animation-delay: 0.8s; opacity:0;"> <!-- Animating image container -->
                     <div class="relative w-full max-w-md">
                         <img src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Elevate Clothing" class="rounded-lg shadow-xl w-full">
                         <div class="absolute -bottom-6 -right-6 bg-white p-4 rounded-lg shadow-lg hidden md:block">
@@ -140,27 +190,27 @@
     <!-- Featured Categories -->
     <section class="py-12 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-2xl font-bold text-center mb-12">Shop By Category</h2>
+            <h2 class="text-2xl font-bold text-center mb-12 fade-in-on-scroll">Shop By Category</h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <a href="#" class="group relative overflow-hidden rounded-lg">
+                <a href="#" class="group relative overflow-hidden rounded-lg fade-in-on-scroll" style="animation-delay: 0.1s;">
                     <img src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=736&q=80" alt="Men's Collection" class="w-full h-48 md:h-64 object-cover transition duration-300 group-hover:scale-105">
                     <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
                         <h3 class="text-white font-medium text-lg">Men's</h3>
                     </div>
                 </a>
-                <a href="#" class="group relative overflow-hidden rounded-lg">
+                <a href="#" class="group relative overflow-hidden rounded-lg fade-in-on-scroll" style="animation-delay: 0.2s;">
                     <img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" alt="Women's Collection" class="w-full h-48 md:h-64 object-cover transition duration-300 group-hover:scale-105">
                     <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
                         <h3 class="text-white font-medium text-lg">Women's</h3>
                     </div>
                 </a>
-                <a href="#" class="group relative overflow-hidden rounded-lg">
+                <a href="#" class="group relative overflow-hidden rounded-lg fade-in-on-scroll" style="animation-delay: 0.3s;">
                     <img src="https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1025&q=80" alt="Accessories" class="w-full h-48 md:h-64 object-cover transition duration-300 group-hover:scale-105">
                     <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
                         <h3 class="text-white font-medium text-lg">Accessories</h3>
                     </div>
                 </a>
-                <a href="#" class="group relative overflow-hidden rounded-lg">
+                <a href="#" class="group relative overflow-hidden rounded-lg fade-in-on-scroll" style="animation-delay: 0.4s;">
                     <img src="https://images.unsplash.com/photo-1551232864-3f0890e580d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" alt="New Arrivals" class="w-full h-48 md:h-64 object-cover transition duration-300 group-hover:scale-105">
                     <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
                         <h3 class="text-white font-medium text-lg">New Arrivals</h3>
@@ -173,7 +223,7 @@
     <!-- Products Section -->
     <section id="shop" class="py-12 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center mb-8">
+            <div class="flex justify-between items-center mb-8 fade-in-on-scroll">
                 <h2 class="text-2xl font-bold">Our Products</h2>
                 <div class="flex space-x-2">
                     <button class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium">All</button>
@@ -414,16 +464,16 @@
     </footer>
 
     <!-- Shopping Cart Sidebar -->
-    <div class="fixed inset-0 z-50 overflow-hidden hidden" id="cart-sidebar">
+    <div class="fixed inset-0 z-50 overflow-hidden /*hidden_was_here*/" id="cart-sidebar"> <!-- Manually removed hidden, will control with JS -->
         <div class="absolute inset-0 overflow-hidden">
-            <div class="absolute inset-0 bg-gray-500 bg-opacity-75 transition-opacity" id="cart-overlay"></div>
+            <div class="absolute inset-0 bg-gray-500 bg-opacity-75" id="cart-overlay"></div> <!-- Removed transition-opacity, handled by CSS -->
             <div class="fixed inset-y-0 right-0 max-w-full flex">
-                <div class="w-screen max-w-md">
+                <div class="w-screen max-w-md" id="cart-panel"> <!-- Added id="cart-panel" -->
                     <div class="h-full flex flex-col bg-white shadow-xl">
                         <div class="flex-1 py-6 overflow-y-auto px-4 sm:px-6">
                             <div class="flex items-start justify-between">
                                 <h2 class="text-lg font-medium text-gray-900">Shopping cart</h2>
-                                <button id="close-cart-btn" class="text-gray-400 hover:text-gray-500">
+                                <button id="close-cart-btn" class="text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded-md">
                                     <i class="fas fa-times"></i>
                                 </button>
                             </div>
@@ -442,12 +492,12 @@
                                 <p id="cart-subtotal">$0.00</p>
                             </div>
                             <p class="mt-0.5 text-sm text-gray-500 mb-6">Shipping and taxes calculated at checkout.</p>
-                            <button class="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800 transition duration-300">
+                            <button class="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800 transition duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
                                 Checkout
                             </button>
                             <div class="mt-4 flex justify-center text-sm text-gray-500">
                                 <p>
-                                    or <button id="continue-shopping-btn" class="text-black font-medium">Continue Shopping</button>
+                                    or <button id="continue-shopping-btn" class="text-indigo-600 hover:text-indigo-500 font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-150">Continue Shopping</button>
                                 </p>
                             </div>
                         </div>
@@ -594,6 +644,15 @@
 
         // Shopping cart functionality
         let cart = [];
+        try {
+            const storedCart = localStorage.getItem('cart');
+            if (storedCart) {
+                cart = JSON.parse(storedCart);
+            }
+        } catch (e) {
+            console.error("Error parsing cart from localStorage", e);
+            cart = []; // Fallback to empty cart on error
+        }
         
         // DOM elements
         const productsContainer = document.getElementById('products-container');
@@ -626,10 +685,12 @@
                 const productElement = document.createElement('div');
                 productElement.className = 'group relative';
                 productElement.innerHTML = `
-                    <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-200">
-                        <img src="${product.image}" alt="${product.title}" class="h-full w-full object-cover object-center group-hover:opacity-75">
+                    <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-200 group"> <!-- Added group here for scale -->
+                        <a href="product-detail.html?id=${product.id}">
+                            <img src="${product.image}" alt="${product.title}" class="h-full w-full object-cover object-center group-hover:opacity-75 transition-transform duration-300 ease-in-out group-hover:scale-105">
+                        </a>
                         <div class="product-overlay absolute inset-0 flex items-center justify-center opacity-0">
-                            <button class="bg-black text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-gray-800 quick-view-btn" data-id="${product.id}">
+                            <button class="bg-black text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors duration-200 quick-view-btn" data-id="${product.id}">
                                 Quick View
                             </button>
                         </div>
@@ -637,13 +698,13 @@
                     <div class="mt-4 flex justify-between">
                         <div>
                             <h3 class="text-sm text-gray-700">
-                                <a href="#" class="font-medium">${product.title}</a>
+                                <a href="product-detail.html?id=${product.id}" class="font-medium">${product.title}</a>
                             </h3>
                             <p class="mt-1 text-sm text-gray-500">${product.category}</p>
                         </div>
                         <p class="text-sm font-medium text-gray-900">$${product.price.toFixed(2)}</p>
                     </div>
-                    <button class="mt-2 w-full bg-gray-100 py-2 rounded-md text-sm font-medium hover:bg-gray-200 add-to-cart-btn" data-id="${product.id}">
+                    <button class="mt-2 w-full bg-gray-100 py-2 rounded-md text-sm font-medium hover:bg-gray-200 transition-colors duration-200 ease-in-out add-to-cart-btn" data-id="${product.id}">
                         Add to Cart
                     </button>
                 `;
@@ -775,11 +836,11 @@
                         </div>
                         <div class="flex flex-1 items-end justify-between text-sm">
                             <div class="flex items-center">
-                                <button class="border border-gray-300 px-2 py-1 rounded-l decrease-quantity" data-id="${item.id}">-</button>
+                                <button class="border border-gray-300 px-2 py-1 rounded-l decrease-quantity hover:bg-gray-100 active:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors duration-150" data-id="${item.id}">-</button>
                                 <span class="border-t border-b border-gray-300 px-3 py-1">${item.quantity}</span>
-                                <button class="border border-gray-300 px-2 py-1 rounded-r increase-quantity" data-id="${item.id}">+</button>
+                                <button class="border border-gray-300 px-2 py-1 rounded-r increase-quantity hover:bg-gray-100 active:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors duration-150" data-id="${item.id}">+</button>
                             </div>
-                            <button type="button" class="font-medium text-black hover:text-gray-500 remove-item" data-id="${item.id}">
+                            <button type="button" class="font-medium text-red-600 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-red-500 transition-colors duration-150 remove-item" data-id="${item.id}">
                                 Remove
                             </button>
                         </div>
@@ -824,28 +885,90 @@
         
         // Toggle cart sidebar
         function toggleCartSidebar() {
-            if (cartSidebar.classList.contains('hidden')) {
-                cartSidebar.classList.remove('hidden');
-                document.body.classList.add('overflow-hidden');
-            } else {
-                cartSidebar.classList.add('hidden');
+            const isOpen = cartSidebar.classList.contains('cart-sidebar-open');
+            if (isOpen) {
+                cartSidebar.classList.remove('cart-sidebar-open');
                 document.body.classList.remove('overflow-hidden');
+                // Add 'hidden' class after transition to remove from layout and a11y tree
+                setTimeout(() => {
+                    if (!cartSidebar.classList.contains('cart-sidebar-open')) { // Check again in case it was quickly reopened
+                        cartSidebar.classList.add('hidden');
+                    }
+                }, 300); // Match transition duration
+            } else {
+                cartSidebar.classList.remove('hidden'); // Remove hidden before starting animation
+                // Forcing a reflow can sometimes be necessary if adding/removing hidden and starting a transition immediately
+                // but usually not an issue with opacity/transform if the element is already display:block.
+                // void cartSidebar.offsetWidth; // Trigger reflow - might not be needed
+                cartSidebar.classList.add('cart-sidebar-open');
+                document.body.classList.add('overflow-hidden');
             }
         }
         
         // Toggle mobile menu
         function toggleMobileMenu() {
-            mobileMenu.classList.toggle('hidden');
+            const isOpen = mobileMenu.classList.contains('is-open');
+            if (isOpen) {
+                mobileMenu.classList.remove('is-open');
+                setTimeout(() => {
+                    if (!mobileMenu.classList.contains('is-open')) {
+                         mobileMenu.classList.add('hidden');
+                    }
+                }, 300);
+            } else {
+                mobileMenu.classList.remove('hidden');
+                // void mobileMenu.offsetWidth; // Trigger reflow if needed
+                mobileMenu.classList.add('is-open');
+            }
         }
         
         // Toggle search bar
         function toggleSearchBar() {
-            searchBar.classList.toggle('hidden');
+            const isOpen = searchBar.classList.contains('is-open');
+            if (isOpen) {
+                searchBar.classList.remove('is-open');
+                setTimeout(() => {
+                    if (!searchBar.classList.contains('is-open')) {
+                        searchBar.classList.add('hidden');
+                    }
+                }, 300);
+            } else {
+                searchBar.classList.remove('hidden');
+                // void searchBar.offsetWidth; // Trigger reflow if needed
+                searchBar.classList.add('is-open');
+            }
         }
         
         // Event listeners
         document.addEventListener('DOMContentLoaded', () => {
             displayProducts();
+            updateCart(); // Initialize cart display from localStorage
+
+            // Initially hide elements controlled by JS transitions
+            if (!cartSidebar.classList.contains('cart-sidebar-open')) {
+                cartSidebar.classList.add('hidden');
+            }
+            if (!mobileMenu.classList.contains('is-open')) {
+                mobileMenu.classList.add('hidden');
+            }
+            if (!searchBar.classList.contains('is-open')) {
+                searchBar.classList.add('hidden');
+            }
+
+            // Scroll-based animations
+            const scrollElements = document.querySelectorAll('.fade-in-on-scroll');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target); // Animate only once
+                    }
+                });
+            }, { threshold: 0.1 }); // Adjust threshold as needed
+
+            scrollElements.forEach(el => {
+                observer.observe(el);
+            });
             
             // Cart functionality
             cartBtn.addEventListener('click', toggleCartSidebar);
