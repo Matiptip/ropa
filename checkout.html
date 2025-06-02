@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | ELEVATE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Montserrat', sans-serif;
+        }
+        #order-confirmation-message {
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Simplified Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-xl font-bold text-gray-900">ELEVATE</a>
+                </div>
+                <div class="flex items-center">
+                    <a href="index.html#shop" class="text-gray-700 hover:text-gray-900">Continue Shopping</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-3xl mx-auto px-4 py-12">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8 text-center">Checkout</h1>
+
+        <div id="order-confirmation-message" class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-md relative mb-6" role="alert">
+            <strong class="font-bold">Success!</strong>
+            <span class="block sm:inline"> Your order summary has been prepared for WhatsApp. Please send the message to finalize your order. Your cart has been cleared.</span>
+        </div>
+
+        <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">Order Summary</h2>
+            <div id="cart-summary-container" class="space-y-3">
+                <!-- Cart items will be loaded here by JavaScript -->
+            </div>
+            <div class="border-t pt-4 mt-4">
+                <div class="flex justify-between items-center font-semibold text-lg">
+                    <p>Subtotal</p>
+                    <p id="cart-subtotal-checkout">$0.00</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="checkout-details-container" class="bg-white shadow-md rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-6">Your Details</h2>
+            <form id="checkout-form">
+                <div class="mb-4">
+                    <label for="customer-name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input type="text" id="customer-name" name="customer-name" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div class="mb-6">
+                    <label for="customer-phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number (with country code)</label>
+                    <input type="tel" id="customer-phone" name="customer-phone" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., 5491123456789">
+                </div>
+
+                <button type="submit" id="send-whatsapp-order-btn" class="w-full bg-green-500 text-white py-3 px-4 rounded-md hover:bg-green-600 font-semibold text-lg transition duration-300 flex items-center justify-center space-x-2">
+                    <i class="fab fa-whatsapp text-xl"></i>
+                    <span>Send Order via WhatsApp</span>
+                </button>
+            </form>
+        </div>
+         <div class="mt-8 text-center">
+            <a href="index.html#shop" class="text-indigo-600 hover:text-indigo-500 font-medium">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Shop
+            </a>
+        </div>
+    </main>
+
+    <footer class="bg-gray-200 text-center py-6 mt-12">
+        <p class="text-gray-600 text-sm">&copy; 2023 ELEVATE. All rights reserved.</p>
+    </footer>
+
+    <script>
+        let cart = []; // Globally scoped cart for this page
+
+        function displayCartSummary() {
+            try {
+                const storedCart = localStorage.getItem('cart');
+                cart = storedCart ? JSON.parse(storedCart) : [];
+                if (!Array.isArray(cart)) {
+                    cart = [];
+                }
+            } catch (e) {
+                console.error("Error parsing cart from localStorage", e);
+                cart = [];
+            }
+
+            const cartSummaryContainer = document.getElementById('cart-summary-container');
+            const cartSubtotalCheckout = document.getElementById('cart-subtotal-checkout');
+            const checkoutForm = document.getElementById('checkout-form');
+            const checkoutDetailsContainer = document.getElementById('checkout-details-container'); // To hide if cart is empty
+
+            if (cart.length === 0) {
+                cartSummaryContainer.innerHTML = '<p class="text-gray-500 text-center py-4">Your cart is empty. Please add items to your cart before proceeding to checkout.</p>';
+                cartSubtotalCheckout.textContent = '$0.00';
+                if (checkoutDetailsContainer) checkoutDetailsContainer.style.display = 'none'; // Hide form and details section
+                return;
+            }
+
+            if (checkoutDetailsContainer) checkoutDetailsContainer.style.display = 'block'; // Ensure form section is visible
+            cartSummaryContainer.innerHTML = ''; // Clear existing items
+            let subtotal = 0;
+
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+
+                const itemElement = document.createElement('div');
+                itemElement.className = 'flex justify-between items-center text-sm py-2 border-b border-gray-200 last:border-b-0';
+                itemElement.innerHTML = `
+                    <div>
+                        <p class="font-medium">${item.title} <span class="text-xs text-gray-600">(x${item.quantity})</span></p>
+                        <p class="text-xs text-gray-500">Unit Price: $${item.price.toFixed(2)}</p>
+                    </div>
+                    <p class="font-medium">$${itemTotal.toFixed(2)}</p>
+                `;
+                cartSummaryContainer.appendChild(itemElement);
+            });
+
+            cartSubtotalCheckout.textContent = `$${subtotal.toFixed(2)}`;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            displayCartSummary(); // Load cart summary on page load
+
+            const checkoutForm = document.getElementById('checkout-form');
+            const orderConfirmationMessage = document.getElementById('order-confirmation-message');
+
+
+            if (checkoutForm) {
+                checkoutForm.addEventListener('submit', function(event) {
+                    event.preventDefault();
+
+                    const customerNameInput = document.getElementById('customer-name');
+                    const customerPhoneInput = document.getElementById('customer-phone');
+
+                    const customerName = customerNameInput.value.trim();
+                    const customerPhone = customerPhoneInput.value.trim();
+
+                    if (!customerName) {
+                        alert('Please enter your full name.');
+                        customerNameInput.focus();
+                        return;
+                    }
+                    if (!customerPhone) {
+                        alert('Please enter your phone number.');
+                        customerPhoneInput.focus();
+                        return;
+                    }
+                    // Basic phone validation (starts with country code, then numbers)
+                    // This is a very basic example, consider a library for robust validation
+                    if (!/^\d{10,15}$/.test(customerPhone.replace('+', ''))) {
+                         alert('Please enter a valid phone number with country code (e.g., 5491123456789 for Argentina). Only numbers and optional leading +.');
+                         customerPhoneInput.focus();
+                         return;
+                    }
+
+
+                    if (cart.length === 0) {
+                        alert('Your cart is empty. Please add items before placing an order.');
+                        return;
+                    }
+
+                    let message = "Hello ELEVATE! I'd like to place an order:\n\n";
+                    message += `Name: ${customerName}\n`;
+                    message += `Phone: ${customerPhone}\n\n`;
+                    message += "Items:\n";
+
+                    let orderSubtotal = 0;
+                    cart.forEach(item => {
+                        const itemTotal = item.price * item.quantity;
+                        message += `- ${item.title} (x${item.quantity}) - $${itemTotal.toFixed(2)}\n`;
+                        orderSubtotal += itemTotal;
+                    });
+
+                    message += `\nTotal: $${orderSubtotal.toFixed(2)}\n\n`;
+                    message += "Please let me know the next steps!";
+
+                    const whatsappNumber = "5491135203319"; // Replace with your target WhatsApp number
+                    const encodedMessage = encodeURIComponent(message);
+                    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+
+                    window.open(whatsappUrl, '_blank');
+
+                    // Post-submission actions
+                    localStorage.removeItem('cart');
+                    cart = []; // Clear the local cart variable
+                    displayCartSummary(); // Update UI to show empty cart and hide form
+
+                    if(orderConfirmationMessage) orderConfirmationMessage.classList.remove('hidden');
+                    if(checkoutForm) checkoutForm.reset(); // Reset form fields
+
+                    // Scroll to the confirmation message
+                    orderConfirmationMessage.focus(); // For screen readers
+                    window.scrollTo({ top: orderConfirmationMessage.offsetTop - 20, behavior: 'smooth' });
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -493,9 +493,9 @@
                                 <p id="cart-subtotal">$0.00</p>
                             </div>
                             <p class="mt-0.5 text-sm text-gray-500 mb-6">Shipping and taxes calculated at checkout.</p>
-                            <button class="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800 transition duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
+                            <a href="checkout.html" id="checkout-button-link" class="block w-full bg-black text-white py-3 rounded-md hover:bg-gray-800 transition duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black text-center">
                                 Checkout
-                            </button>
+                            </a>
                             <div class="mt-4 flex justify-center text-sm text-gray-500">
                                 <p>
                                     or <button id="continue-shopping-btn" class="text-indigo-600 hover:text-indigo-500 font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-150">Continue Shopping</button>
@@ -815,13 +815,27 @@
             
             // Update cart items
             cartItemsContainer.innerHTML = '';
+            const checkoutLink = document.getElementById('checkout-button-link');
             
             if (cart.length === 0) {
                 cartItemsContainer.innerHTML = '<p class="text-gray-500 text-center py-8">Your cart is empty</p>';
                 cartSubtotal.textContent = '$0.00';
+                if (checkoutLink) {
+                    checkoutLink.classList.add('opacity-50', 'cursor-not-allowed');
+                    checkoutLink.setAttribute('aria-disabled', 'true');
+                    checkoutLink.onclick = (e) => e.preventDefault();
+                }
+                localStorage.setItem('cart', JSON.stringify(cart)); // Save empty cart state
                 return;
             }
             
+            // If cart is NOT empty, ensure link is enabled
+            if (checkoutLink) {
+                checkoutLink.classList.remove('opacity-50', 'cursor-not-allowed');
+                checkoutLink.removeAttribute('aria-disabled');
+                checkoutLink.onclick = null;
+            }
+
             let subtotal = 0;
             
             cart.forEach(item => {
@@ -889,6 +903,7 @@
                     removeFromCart(productId);
                 });
             });
+            localStorage.setItem('cart', JSON.stringify(cart)); // Save cart state
         }
         
         // Toggle cart sidebar
