@@ -27,6 +27,7 @@
             transition: all 0.3s ease;
             opacity: 0;
             transform: translateY(10px);
+            cursor: pointer; /* Added for better UX */
         }
         
         .cart-item-enter {
@@ -689,8 +690,8 @@
                         <a href="product-detail.html?id=${product.id}">
                             <img src="${product.image}" alt="${product.title}" class="h-full w-full object-cover object-center group-hover:opacity-75 transition-transform duration-300 ease-in-out group-hover:scale-105">
                         </a>
-                        <div class="product-overlay absolute inset-0 flex items-center justify-center opacity-0">
-                            <button class="bg-black text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors duration-200 quick-view-btn" data-id="${product.id}">
+                        <div class="product-overlay absolute inset-0 flex items-center justify-center opacity-0" data-id="${product.id}"> <!-- Added data-id here -->
+                            <button class="bg-black text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors duration-200 quick-view-btn-visual" data-id="${product.id}" tabindex="-1"> <!-- Changed class, made button non-focusable if overlay handles click -->
                                 Quick View
                             </button>
                         </div>
@@ -712,11 +713,18 @@
                 productsContainer.appendChild(productElement);
             });
             
-            // Add event listeners to quick view buttons
-            document.querySelectorAll('.quick-view-btn').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const productId = parseInt(e.target.getAttribute('data-id'));
-                    openQuickView(productId);
+            // Add event listeners to quick view overlays
+            document.querySelectorAll('.product-overlay').forEach(overlay => {
+                overlay.addEventListener('click', (e) => {
+                    // Prevent Quick View from triggering if the actual button inside (if it still exists and is clicked)
+                    // or any other interactive element inside the overlay is clicked.
+                    // For this case, the button is now purely visual or can be removed.
+                    // If the click is on the button (e.target.closest('.quick-view-btn-visual')),
+                    // then currentTarget (the overlay) will still handle it.
+                    const productId = parseInt(e.currentTarget.getAttribute('data-id'));
+                    if (productId) {
+                        openQuickView(productId);
+                    }
                 });
             });
             
