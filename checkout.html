@@ -90,16 +90,21 @@
         let cart = []; // Globally scoped cart for this page
 
         function displayCartSummary() {
+            const rawStoredCart = localStorage.getItem('cart');
+            console.log("Checkout Page - Raw storedCart from localStorage:", rawStoredCart);
+
             try {
-                const storedCart = localStorage.getItem('cart');
-                cart = storedCart ? JSON.parse(storedCart) : [];
+                cart = rawStoredCart ? JSON.parse(rawStoredCart) : [];
                 if (!Array.isArray(cart)) {
+                    // Optional: console.log("Checkout Page - Parsed cart was not an array, resetting. Value was:", cart);
                     cart = [];
                 }
             } catch (e) {
                 console.error("Error parsing cart from localStorage", e);
                 cart = [];
             }
+            console.log("Checkout Page - Parsed cart variable state:", JSON.stringify(cart));
+
 
             const cartSummaryContainer = document.getElementById('cart-summary-container');
             const cartSubtotalCheckout = document.getElementById('cart-subtotal-checkout');
@@ -122,13 +127,27 @@
                 subtotal += itemTotal;
 
                 const itemElement = document.createElement('div');
-                itemElement.className = 'flex justify-between items-center text-sm py-2 border-b border-gray-200 last:border-b-0';
+                itemElement.className = 'flex justify-between items-start text-sm py-2 border-b border-gray-200 last:border-b-0'; // items-start for better alignment with multi-line text
+
+                let optionsHtml = '';
+                if (item.selectedSize && item.selectedSize !== 'null' && item.selectedSize !== 'undefined') {
+                    optionsHtml += `<span class="text-xs text-gray-500">Size: ${item.selectedSize}</span>`;
+                }
+                if (item.selectedColor && item.selectedColor !== 'null' && item.selectedColor !== 'undefined') {
+                    if (optionsHtml) optionsHtml += `<span class="text-xs text-gray-500 mx-1">|</span>`;
+                    optionsHtml += `<span class="text-xs text-gray-500">Color: ${item.selectedColor}</span>`;
+                }
+                if (optionsHtml) {
+                    optionsHtml = `<p class="mt-0.5">${optionsHtml}</p>`;
+                }
+
                 itemElement.innerHTML = `
-                    <div>
+                    <div class="flex-grow">
                         <p class="font-medium">${item.title} <span class="text-xs text-gray-600">(x${item.quantity})</span></p>
-                        <p class="text-xs text-gray-500">Unit Price: $${item.price.toFixed(2)}</p>
+                        ${optionsHtml}
+                        <p class="text-xs text-gray-500 mt-0.5">Unit Price: $${item.price.toFixed(2)}</p>
                     </div>
-                    <p class="font-medium">$${itemTotal.toFixed(2)}</p>
+                    <p class="font-medium ml-4 flex-shrink-0">$${itemTotal.toFixed(2)}</p>
                 `;
                 cartSummaryContainer.appendChild(itemElement);
             });
@@ -185,7 +204,23 @@
                     let orderSubtotal = 0;
                     cart.forEach(item => {
                         const itemTotal = item.price * item.quantity;
-                        message += `- ${item.title} (x${item.quantity}) - $${itemTotal.toFixed(2)}\n`;
+                        let itemLine = `- ${item.title}`;
+
+                        let optionsDetail = '';
+                        if (item.selectedSize && item.selectedSize !== 'null' && item.selectedSize !== 'undefined') {
+                            optionsDetail += `Size: ${item.selectedSize}`;
+                        }
+                        if (item.selectedColor && item.selectedColor !== 'null' && item.selectedColor !== 'undefined') {
+                            if (optionsDetail) optionsDetail += ', ';
+                            optionsDetail += `Color: ${item.selectedColor}`;
+                        }
+
+                        if (optionsDetail) {
+                            itemLine += ` (${optionsDetail})`;
+                        }
+
+                        itemLine += ` (x${item.quantity}) - $${itemTotal.toFixed(2)}\n`;
+                        message += itemLine;
                         orderSubtotal += itemTotal;
                     });
 
@@ -195,6 +230,8 @@
                     const whatsappNumber = "5491135203319"; // Replace with your target WhatsApp number
                     const encodedMessage = encodeURIComponent(message);
                     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+
+                    console.log("Generated WhatsApp URL:", whatsappUrl); // Added for debugging
 
                     window.open(whatsappUrl, '_blank');
 

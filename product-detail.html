@@ -277,6 +277,25 @@
                 if (addToCartButton && quantityInput && product.stock > 0) { // quantityInput is defined above
                     addToCartButton.addEventListener('click', () => {
                         const quantity = parseInt(quantityInput.value);
+
+                        // Retrieve selected size
+                        const selectedSizeEl = document.querySelector('#size-options .size-option.selected');
+                        const selectedSize = selectedSizeEl ? selectedSizeEl.dataset.size : null;
+                        // Optional: Warn if no selection but options available (though UI should pre-select one)
+                        // if (!selectedSizeEl && product.availableSizes && product.availableSizes.length > 0) {
+                        //     console.warn("No size selected, but sizes available.");
+                        // }
+
+                        // Retrieve selected color
+                        const selectedColorSwatchEl = document.querySelector('#color-options .color-swatch.selected');
+                        // The actual color name is on the parent button of the swatch div
+                        const selectedColorName = selectedColorSwatchEl ? selectedColorSwatchEl.closest('.color-option').dataset.colorName : null;
+                        // if (!selectedColorSwatchEl && product.availableColors && product.availableColors.length > 0) {
+                        //     console.warn("No color selected, but colors available.");
+                        // }
+
+                        console.log("Adding to cart from Detail Page - Product ID:", product.id, "Quantity:", quantity, "Selected Size:", selectedSize, "Selected Color:", selectedColorName);
+
                         // Note: product.id is available from the outer scope where 'product' is defined
                         addProductToCart(product.id, quantity);
 
